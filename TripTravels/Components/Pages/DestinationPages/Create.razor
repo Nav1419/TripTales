@@ -1,0 +1,84 @@
+﻿@page "/destinations/create"
+@using Microsoft.EntityFrameworkCore
+@using TripTravels.Domain
+@inject IDbContextFactory<TripTravels.Data.TripTravelsContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Destination</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Destination" OnValidSubmit="AddDestination" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="description" class="form-label">Description:</label> 
+                <InputText id="description" @bind-Value="Destination.Description" class="form-control" /> 
+                <ValidationMessage For="() => Destination.Description" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="city" class="form-label">City:</label> 
+                <InputText id="city" @bind-Value="Destination.City" class="form-control" /> 
+                <ValidationMessage For="() => Destination.City" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="country" class="form-label">Country:</label> 
+                <InputText id="country" @bind-Value="Destination.Country" class="form-control" /> 
+                <ValidationMessage For="() => Destination.Country" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="imageurl" class="form-label">ImageUrl:</label> 
+                <InputText id="imageurl" @bind-Value="Destination.ImageUrl" class="form-control" /> 
+                <ValidationMessage For="() => Destination.ImageUrl" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="datecreated" class="form-label">DateCreated:</label> 
+                <InputDate id="datecreated" @bind-Value="Destination.DateCreated" class="form-control" /> 
+                <ValidationMessage For="() => Destination.DateCreated" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="dateupdated" class="form-label">DateUpdated:</label> 
+                <InputDate id="dateupdated" @bind-Value="Destination.DateUpdated" class="form-control" /> 
+                <ValidationMessage For="() => Destination.DateUpdated" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="createdby" class="form-label">CreatedBy:</label> 
+                <InputText id="createdby" @bind-Value="Destination.CreatedBy" class="form-control" /> 
+                <ValidationMessage For="() => Destination.CreatedBy" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="updatedby" class="form-label">UpdatedBy:</label> 
+                <InputText id="updatedby" @bind-Value="Destination.UpdatedBy" class="form-control" /> 
+                <ValidationMessage For="() => Destination.UpdatedBy" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="isdeleted" class="form-label">IsDeleted:</label> 
+                <InputCheckbox id="isdeleted" @bind-Value="Destination.IsDeleted" class="form-check-input" /> 
+                <ValidationMessage For="() => Destination.IsDeleted" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/destinations">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Destination Destination { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddDestination()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Destination.Add(Destination);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/destinations");
+    }
+}

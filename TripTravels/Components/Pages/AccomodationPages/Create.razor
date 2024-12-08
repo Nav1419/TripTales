@@ -1,0 +1,89 @@
+﻿@page "/accomodations/create"
+@using Microsoft.EntityFrameworkCore
+@using TripTravels.Domain
+@inject IDbContextFactory<TripTravels.Data.TripTravelsContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Accomodation</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Accomodation" OnValidSubmit="AddAccomodation" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="tripid" class="form-label">TripId:</label> 
+                <InputNumber id="tripid" @bind-Value="Accomodation.TripId" class="form-control" /> 
+                <ValidationMessage For="() => Accomodation.TripId" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="address" class="form-label">Address:</label> 
+                <InputText id="address" @bind-Value="Accomodation.Address" class="form-control" /> 
+                <ValidationMessage For="() => Accomodation.Address" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="checkindate" class="form-label">CheckInDate:</label> 
+                <InputDate id="checkindate" @bind-Value="Accomodation.CheckInDate" class="form-control" /> 
+                <ValidationMessage For="() => Accomodation.CheckInDate" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="checkoutdate" class="form-label">CheckOutDate:</label> 
+                <InputDate id="checkoutdate" @bind-Value="Accomodation.CheckOutDate" class="form-control" /> 
+                <ValidationMessage For="() => Accomodation.CheckOutDate" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="cost" class="form-label">Cost:</label> 
+                <InputNumber id="cost" @bind-Value="Accomodation.Cost" class="form-control" /> 
+                <ValidationMessage For="() => Accomodation.Cost" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="datecreated" class="form-label">DateCreated:</label> 
+                <InputDate id="datecreated" @bind-Value="Accomodation.DateCreated" class="form-control" /> 
+                <ValidationMessage For="() => Accomodation.DateCreated" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="dateupdated" class="form-label">DateUpdated:</label> 
+                <InputDate id="dateupdated" @bind-Value="Accomodation.DateUpdated" class="form-control" /> 
+                <ValidationMessage For="() => Accomodation.DateUpdated" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="createdby" class="form-label">CreatedBy:</label> 
+                <InputText id="createdby" @bind-Value="Accomodation.CreatedBy" class="form-control" /> 
+                <ValidationMessage For="() => Accomodation.CreatedBy" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="updatedby" class="form-label">UpdatedBy:</label> 
+                <InputText id="updatedby" @bind-Value="Accomodation.UpdatedBy" class="form-control" /> 
+                <ValidationMessage For="() => Accomodation.UpdatedBy" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="isdeleted" class="form-label">IsDeleted:</label> 
+                <InputCheckbox id="isdeleted" @bind-Value="Accomodation.IsDeleted" class="form-check-input" /> 
+                <ValidationMessage For="() => Accomodation.IsDeleted" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/accomodations">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Accomodation Accomodation { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddAccomodation()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Accomodation.Add(Accomodation);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/accomodations");
+    }
+}

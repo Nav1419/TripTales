@@ -1,0 +1,45 @@
+﻿@page "/reviews"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using TripTravels.Domain
+@using TripTravels.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<TripTravels.Data.TripTravelsContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="reviews/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Review">
+    <PropertyColumn Property="review => review.UserId" />
+    <PropertyColumn Property="review => review.DestinationId" />
+    <PropertyColumn Property="review => review.Rating" />
+    <PropertyColumn Property="review => review.Comment" />
+    <PropertyColumn Property="review => review.ReviewDate" />
+    <PropertyColumn Property="review => review.DateCreated" />
+    <PropertyColumn Property="review => review.DateUpdated" />
+    <PropertyColumn Property="review => review.CreatedBy" />
+    <PropertyColumn Property="review => review.UpdatedBy" />
+    <PropertyColumn Property="review => review.IsDeleted" />
+
+    <TemplateColumn Context="review">
+        <a href="@($"reviews/edit?id={review.Id}")">Edit</a> |
+        <a href="@($"reviews/details?id={review.Id}")">Details</a> |
+        <a href="@($"reviews/delete?id={review.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private TripTravelsContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

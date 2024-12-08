@@ -1,0 +1,64 @@
+﻿@page "/activities/details"
+@using Microsoft.EntityFrameworkCore
+@using TripTravels.Domain
+@inject IDbContextFactory<TripTravels.Data.TripTravelsContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Activity</h2>
+    <hr />
+    @if (activity is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">TripId</dt>
+            <dd class="col-sm-10">@activity.TripId</dd>
+            <dt class="col-sm-2">Description</dt>
+            <dd class="col-sm-10">@activity.Description</dd>
+            <dt class="col-sm-2">ActivityDate</dt>
+            <dd class="col-sm-10">@activity.ActivityDate</dd>
+            <dt class="col-sm-2">Location</dt>
+            <dd class="col-sm-10">@activity.Location</dd>
+            <dt class="col-sm-2">Rate</dt>
+            <dd class="col-sm-10">@activity.Rate</dd>
+            <dt class="col-sm-2">DateCreated</dt>
+            <dd class="col-sm-10">@activity.DateCreated</dd>
+            <dt class="col-sm-2">DateUpdated</dt>
+            <dd class="col-sm-10">@activity.DateUpdated</dd>
+            <dt class="col-sm-2">CreatedBy</dt>
+            <dd class="col-sm-10">@activity.CreatedBy</dd>
+            <dt class="col-sm-2">UpdatedBy</dt>
+            <dd class="col-sm-10">@activity.UpdatedBy</dd>
+            <dt class="col-sm-2">IsDeleted</dt>
+            <dd class="col-sm-10">@activity.IsDeleted</dd>
+        </dl>
+        <div>
+            <a href="@($"/activities/edit?id={activity.Id}")">Edit</a> |
+            <a href="@($"/activities")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Activity? activity;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        activity = await context.Activity.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (activity is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

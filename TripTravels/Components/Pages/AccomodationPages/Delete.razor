@@ -1,0 +1,91 @@
+﻿@page "/accomodations/delete"
+@using Microsoft.EntityFrameworkCore
+@using TripTravels.Domain
+@inject IDbContextFactory<TripTravels.Data.TripTravelsContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Delete</PageTitle>
+
+<h1>Delete</h1>
+
+<p>Are you sure you want to delete this?</p>
+<div>
+    <h2>Accomodation</h2>
+    <hr />
+    @if (accomodation is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">TripId</dt>
+            <dd class="col-sm-10">@accomodation.TripId</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Address</dt>
+            <dd class="col-sm-10">@accomodation.Address</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">CheckInDate</dt>
+            <dd class="col-sm-10">@accomodation.CheckInDate</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">CheckOutDate</dt>
+            <dd class="col-sm-10">@accomodation.CheckOutDate</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Cost</dt>
+            <dd class="col-sm-10">@accomodation.Cost</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">DateCreated</dt>
+            <dd class="col-sm-10">@accomodation.DateCreated</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">DateUpdated</dt>
+            <dd class="col-sm-10">@accomodation.DateUpdated</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">CreatedBy</dt>
+            <dd class="col-sm-10">@accomodation.CreatedBy</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">UpdatedBy</dt>
+            <dd class="col-sm-10">@accomodation.UpdatedBy</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">IsDeleted</dt>
+            <dd class="col-sm-10">@accomodation.IsDeleted</dd>
+        </dl>
+        <EditForm method="post" Model="accomodation" OnValidSubmit="DeleteAccomodation" FormName="delete" Enhance>
+            <button type="submit" class="btn btn-danger" disabled="@(accomodation is null)">Delete</button> |
+            <a href="/accomodations">Back to List</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    private Accomodation? accomodation;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        accomodation = await context.Accomodation.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (accomodation is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    private async Task DeleteAccomodation()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Accomodation.Remove(accomodation!);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/accomodations");
+    }
+}

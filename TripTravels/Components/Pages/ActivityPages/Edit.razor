@@ -1,0 +1,134 @@
+﻿@page "/activities/edit"
+@using Microsoft.EntityFrameworkCore
+@using TripTravels.Domain
+@inject IDbContextFactory<TripTravels.Data.TripTravelsContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>Activity</h2>
+<hr />
+@if (Activity is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Activity" OnValidSubmit="UpdateActivity" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="Activity.Id" value="@Activity.Id" />
+                <div class="mb-3">
+                    <label for="tripid" class="form-label">TripId:</label>
+                    <InputText id="tripid" @bind-Value="Activity.TripId" class="form-control" />
+                    <ValidationMessage For="() => Activity.TripId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description:</label>
+                    <InputText id="description" @bind-Value="Activity.Description" class="form-control" />
+                    <ValidationMessage For="() => Activity.Description" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="activitydate" class="form-label">ActivityDate:</label>
+                    <InputDate id="activitydate" @bind-Value="Activity.ActivityDate" class="form-control" />
+                    <ValidationMessage For="() => Activity.ActivityDate" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="location" class="form-label">Location:</label>
+                    <InputText id="location" @bind-Value="Activity.Location" class="form-control" />
+                    <ValidationMessage For="() => Activity.Location" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="rate" class="form-label">Rate:</label>
+                    <InputNumber id="rate" @bind-Value="Activity.Rate" class="form-control" />
+                    <ValidationMessage For="() => Activity.Rate" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="datecreated" class="form-label">DateCreated:</label>
+                    <InputDate id="datecreated" @bind-Value="Activity.DateCreated" class="form-control" />
+                    <ValidationMessage For="() => Activity.DateCreated" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="dateupdated" class="form-label">DateUpdated:</label>
+                    <InputDate id="dateupdated" @bind-Value="Activity.DateUpdated" class="form-control" />
+                    <ValidationMessage For="() => Activity.DateUpdated" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="createdby" class="form-label">CreatedBy:</label>
+                    <InputText id="createdby" @bind-Value="Activity.CreatedBy" class="form-control" />
+                    <ValidationMessage For="() => Activity.CreatedBy" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="updatedby" class="form-label">UpdatedBy:</label>
+                    <InputText id="updatedby" @bind-Value="Activity.UpdatedBy" class="form-control" />
+                    <ValidationMessage For="() => Activity.UpdatedBy" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="isdeleted" class="form-label">IsDeleted:</label>
+                    <InputCheckbox id="isdeleted" @bind-Value="Activity.IsDeleted" class="form-check-input" />
+                    <ValidationMessage For="() => Activity.IsDeleted" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/activities">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private Activity? Activity { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Activity ??= await context.Activity.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (Activity is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateActivity()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Activity!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!ActivityExists(Activity!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/activities");
+    }
+
+    private bool ActivityExists(int id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Activity.Any(e => e.Id == id);
+    }
+}

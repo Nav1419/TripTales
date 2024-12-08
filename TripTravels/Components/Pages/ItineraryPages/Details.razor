@@ -1,0 +1,60 @@
+﻿@page "/itineraries/details"
+@using Microsoft.EntityFrameworkCore
+@using TripTravels.Domain
+@inject IDbContextFactory<TripTravels.Data.TripTravelsContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Itinerary</h2>
+    <hr />
+    @if (itinerary is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">StartDate</dt>
+            <dd class="col-sm-10">@itinerary.StartDate</dd>
+            <dt class="col-sm-2">EndDate</dt>
+            <dd class="col-sm-10">@itinerary.EndDate</dd>
+            <dt class="col-sm-2">TripId</dt>
+            <dd class="col-sm-10">@itinerary.TripId</dd>
+            <dt class="col-sm-2">DateCreated</dt>
+            <dd class="col-sm-10">@itinerary.DateCreated</dd>
+            <dt class="col-sm-2">DateUpdated</dt>
+            <dd class="col-sm-10">@itinerary.DateUpdated</dd>
+            <dt class="col-sm-2">CreatedBy</dt>
+            <dd class="col-sm-10">@itinerary.CreatedBy</dd>
+            <dt class="col-sm-2">UpdatedBy</dt>
+            <dd class="col-sm-10">@itinerary.UpdatedBy</dd>
+            <dt class="col-sm-2">IsDeleted</dt>
+            <dd class="col-sm-10">@itinerary.IsDeleted</dd>
+        </dl>
+        <div>
+            <a href="@($"/itineraries/edit?id={itinerary.Id}")">Edit</a> |
+            <a href="@($"/itineraries")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Itinerary? itinerary;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        itinerary = await context.Itinerary.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (itinerary is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

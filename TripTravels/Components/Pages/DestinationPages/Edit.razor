@@ -1,0 +1,129 @@
+﻿@page "/destinations/edit"
+@using Microsoft.EntityFrameworkCore
+@using TripTravels.Domain
+@inject IDbContextFactory<TripTravels.Data.TripTravelsContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>Destination</h2>
+<hr />
+@if (Destination is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Destination" OnValidSubmit="UpdateDestination" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="Destination.Id" value="@Destination.Id" />
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description:</label>
+                    <InputText id="description" @bind-Value="Destination.Description" class="form-control" />
+                    <ValidationMessage For="() => Destination.Description" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="city" class="form-label">City:</label>
+                    <InputText id="city" @bind-Value="Destination.City" class="form-control" />
+                    <ValidationMessage For="() => Destination.City" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="country" class="form-label">Country:</label>
+                    <InputText id="country" @bind-Value="Destination.Country" class="form-control" />
+                    <ValidationMessage For="() => Destination.Country" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="imageurl" class="form-label">ImageUrl:</label>
+                    <InputText id="imageurl" @bind-Value="Destination.ImageUrl" class="form-control" />
+                    <ValidationMessage For="() => Destination.ImageUrl" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="datecreated" class="form-label">DateCreated:</label>
+                    <InputDate id="datecreated" @bind-Value="Destination.DateCreated" class="form-control" />
+                    <ValidationMessage For="() => Destination.DateCreated" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="dateupdated" class="form-label">DateUpdated:</label>
+                    <InputDate id="dateupdated" @bind-Value="Destination.DateUpdated" class="form-control" />
+                    <ValidationMessage For="() => Destination.DateUpdated" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="createdby" class="form-label">CreatedBy:</label>
+                    <InputText id="createdby" @bind-Value="Destination.CreatedBy" class="form-control" />
+                    <ValidationMessage For="() => Destination.CreatedBy" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="updatedby" class="form-label">UpdatedBy:</label>
+                    <InputText id="updatedby" @bind-Value="Destination.UpdatedBy" class="form-control" />
+                    <ValidationMessage For="() => Destination.UpdatedBy" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="isdeleted" class="form-label">IsDeleted:</label>
+                    <InputCheckbox id="isdeleted" @bind-Value="Destination.IsDeleted" class="form-check-input" />
+                    <ValidationMessage For="() => Destination.IsDeleted" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/destinations">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private Destination? Destination { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Destination ??= await context.Destination.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (Destination is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateDestination()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Destination!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!DestinationExists(Destination!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/destinations");
+    }
+
+    private bool DestinationExists(int id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Destination.Any(e => e.Id == id);
+    }
+}

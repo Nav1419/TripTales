@@ -1,0 +1,45 @@
+﻿@page "/accomodations"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using TripTravels.Domain
+@using TripTravels.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<TripTravels.Data.TripTravelsContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="accomodations/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Accomodation">
+    <PropertyColumn Property="accomodation => accomodation.TripId" />
+    <PropertyColumn Property="accomodation => accomodation.Address" />
+    <PropertyColumn Property="accomodation => accomodation.CheckInDate" />
+    <PropertyColumn Property="accomodation => accomodation.CheckOutDate" />
+    <PropertyColumn Property="accomodation => accomodation.Cost" />
+    <PropertyColumn Property="accomodation => accomodation.DateCreated" />
+    <PropertyColumn Property="accomodation => accomodation.DateUpdated" />
+    <PropertyColumn Property="accomodation => accomodation.CreatedBy" />
+    <PropertyColumn Property="accomodation => accomodation.UpdatedBy" />
+    <PropertyColumn Property="accomodation => accomodation.IsDeleted" />
+
+    <TemplateColumn Context="accomodation">
+        <a href="@($"accomodations/edit?id={accomodation.Id}")">Edit</a> |
+        <a href="@($"accomodations/details?id={accomodation.Id}")">Details</a> |
+        <a href="@($"accomodations/delete?id={accomodation.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private TripTravelsContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

@@ -1,0 +1,60 @@
+﻿@page "/trips/details"
+@using Microsoft.EntityFrameworkCore
+@using TripTravels.Domain
+@inject IDbContextFactory<TripTravels.Data.TripTravelsContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Trip</h2>
+    <hr />
+    @if (trip is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">StartDate</dt>
+            <dd class="col-sm-10">@trip.StartDate</dd>
+            <dt class="col-sm-2">EndDate</dt>
+            <dd class="col-sm-10">@trip.EndDate</dd>
+            <dt class="col-sm-2">Description</dt>
+            <dd class="col-sm-10">@trip.Description</dd>
+            <dt class="col-sm-2">DateCreated</dt>
+            <dd class="col-sm-10">@trip.DateCreated</dd>
+            <dt class="col-sm-2">DateUpdated</dt>
+            <dd class="col-sm-10">@trip.DateUpdated</dd>
+            <dt class="col-sm-2">CreatedBy</dt>
+            <dd class="col-sm-10">@trip.CreatedBy</dd>
+            <dt class="col-sm-2">UpdatedBy</dt>
+            <dd class="col-sm-10">@trip.UpdatedBy</dd>
+            <dt class="col-sm-2">IsDeleted</dt>
+            <dd class="col-sm-10">@trip.IsDeleted</dd>
+        </dl>
+        <div>
+            <a href="@($"/trips/edit?id={trip.Id}")">Edit</a> |
+            <a href="@($"/trips")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Trip? trip;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        trip = await context.Trip.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (trip is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}
